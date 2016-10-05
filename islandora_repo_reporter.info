@@ -1,0 +1,7 @@
+name = Islandora Repo Reporter
+description = "Provides statistics and other information about an Islandora repository."
+package = Islandora Tools
+version = 7.x-dev
+core = 7.x
+php = 5.3
+dependencies[] = islandora
