@@ -45,11 +45,17 @@ function drush_islandora_repo_reporter() {
   drush_print(t("Number of collection objects: !count", array('!count' => $collection_count)));
 
   $oldest = islandora_repo_reporter_get_object_created_on('ASC');
-  drush_print(t("Oldest object created on !oldest", array('!oldest' => $oldest)));
+  drush_print(t("Oldest object (!pid) created on !date", array('!pid' => $oldest[0], '!date' => $oldest[1])));
 
   $newest = islandora_repo_reporter_get_object_created_on('DESC');
-  drush_print(t("Newest object created on !newest", array('!newest' => $newest)));
+  drush_print(t("Newest object (!pid) created on !date", array('!pid' => $newest[0], '!date' => $newest[1])));
 
   $module_names = islandora_repo_reporter_get_islandora_modules();
-  drush_print(t("Islandora modules enabled: !modules", array('!modules' => $module_names)));
+  $names = PHP_EOL;
+  foreach ($module_names as $name) {
+    $names .= ' -' . $name . PHP_EOL;
+  }
+  $names = rtrim($names);
+
+  drush_print(t("Islandora modules enabled: !modules", array('!modules' => $names)));
 }

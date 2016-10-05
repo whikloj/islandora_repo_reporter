@@ -50,13 +50,13 @@ EOQ;
 }
 
 /**
- * Queries the resource index to get the most recent created on date in repo.
+ * Queries the resource index to get the most recent or earlies object in repo.
  *
  * @param string $order
  *   The order to sort in, either 'ASC' or 'DESC'.
  *
- * @return int
- *   The date.
+ * @return array
+ *   An array containing the PID of the objec and the date.
  */
 function islandora_repo_reporter_get_object_created_on($order) {
   $user = user_load(1);
@@ -73,7 +73,8 @@ function islandora_repo_reporter_get_object_created_on($order) {
 EOQ;
 
   $result = $connection->repository->ri->sparqlQuery($ri_query, 1);
-  return $result[0]['created']['value'];
+  // var_dump($result);
+  return array($result[0]['object']['value'], $result[0]['created']['value']);
 }
 
 /**
@@ -83,7 +84,6 @@ EOQ;
  *   The date.
  */
 function islandora_repo_reporter_get_islandora_modules() {
-  // select name from system where name like "islandora%" and status = 1 order by name
   $result = db_select('system')
    ->fields('system', array('name'))
    ->condition('status', 1)
@@ -91,9 +91,9 @@ function islandora_repo_reporter_get_islandora_modules() {
    ->orderBy('name', 'ASC')
    ->execute()->fetchAll();
 
-  $names = PHP_EOL;
+  $names = array();
   foreach ($result as $row) {
-    $names .= ' -' . $row->name . PHP_EOL;
+    $names[] = $row->name;
   }
-  return rtrim($names);
+  return $names;
 }
