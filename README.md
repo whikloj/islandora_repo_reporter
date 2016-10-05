@@ -5,6 +5,7 @@ Utility module that generates some basic information about an Islandora reposito
 ## Requirements
 
 * [Islandora](https://github.com/Islandora/islandora)
+* [Islandora Solr Search](https://github.com/Islandora/islandora_solr_search)
 
 ## Installation
 
@@ -19,7 +20,8 @@ Also, this module offers one drush command, `drush ireporepo`. Running this comm
 * the total number of objects in your repo
 * the number of collection objects
 * the created dates of the oldest and most recent objects in the repo
-* a list of modules that are enabled and whose machine names begin with 'islandora'
+* the number of objects indexed in Solr
+* a list of "Islandora" modules that are enabled
 
 ## Maintainer
 
@@ -27,6 +29,7 @@ Also, this module offers one drush command, `drush ireporepo`. Running this comm
 
 ## To do
 
+* Add ability to pregenerate status data using Druah and cache it for use in the GUI report page
 * Add reports on:
   * Installed content models
   * XACML policies in effect
