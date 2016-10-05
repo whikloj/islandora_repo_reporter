@@ -56,6 +56,8 @@ function drush_islandora_repo_reporter() {
     $names .= ' -' . $name . PHP_EOL;
   }
   $names = rtrim($names);
-
   drush_print(t("Islandora modules enabled: !modules", array('!modules' => $names)));
+
+  $num_pids_in_solr = islandora_repo_reporter_query_solr();
+  drush_print(t("Number of objects indexed in Solr: !num_objects_in_solr", array('!num_objects_in_solr' => $num_pids_in_solr)));
 }

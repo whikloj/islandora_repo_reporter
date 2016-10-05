@@ -97,3 +97,19 @@ function islandora_repo_reporter_get_islandora_modules() {
   }
   return $names;
 }
+
+/**
+ * Queries Islandora's Solr index to get the number of indexed objects.
+ *
+ * @return int
+ *   The number of PIDs Solr knows about.
+ */
+function islandora_repo_reporter_query_solr() {
+  $query_processor = new IslandoraSolrQueryProcessor();
+  $query_processor->solrQuery = "PID:*";
+  // Some very high number.
+  $query_processor->solrLimit = '5000000';
+  $query_processor->executeQuery(FALSE);
+  $num_pids = $query_processor->islandoraSolrResult['response']['numFound'];
+  return $num_pids;
+}

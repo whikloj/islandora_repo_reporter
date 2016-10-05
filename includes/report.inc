@@ -21,5 +21,8 @@ function islandora_repo_reporter_report() {
   $newest = islandora_repo_reporter_get_object_created_on('DESC');
   $items['islandora_repo_reporter_newest_object'] = array('title' => t('Newest object'), 'value' => $newest[0] . ' (created ' . $newest[1] . ')');
 
+  $num_pids_in_solr = islandora_repo_reporter_query_solr();
+  $items['islandora_repo_reporter_pids_in_solr'] = array('title' => t('Number of objects indexed in Solr'), 'value' => $num_pids_in_solr);
+
   return theme('status_report', array('requirements' => $items));
 }
