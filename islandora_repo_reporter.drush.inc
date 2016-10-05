@@ -42,7 +42,7 @@ function drush_islandora_repo_reporter() {
   drush_print(t("Total number of objects in this repo: !count", array('!count' => $object_count)));
 
   $collection_count = islandora_repo_reporter_get_collection_object_count();
-  drush_print(t("Number of collection objects in this repo: !count", array('!count' => $collection_count)));
+  drush_print(t("Number of collection objects: !count", array('!count' => $collection_count)));
 
   $oldest = islandora_repo_reporter_get_object_created_on('ASC');
   drush_print(t("Oldest object created on !oldest", array('!oldest' => $oldest)));
@@ -51,5 +51,5 @@ function drush_islandora_repo_reporter() {
   drush_print(t("Newest object created on !newest", array('!newest' => $newest)));
 
   $module_names = islandora_repo_reporter_get_islandora_modules();
-  drush_print(t("Islandora modules enabled !modules", array('!modules' => $module_names)));
+  drush_print(t("Islandora modules enabled: !modules", array('!modules' => $module_names)));
 }

@@ -93,7 +93,7 @@ function islandora_repo_reporter_get_islandora_modules() {
 
   $names = PHP_EOL;
   foreach ($result as $row) {
-    $names .= $row->name . PHP_EOL;
+    $names .= ' -' . $row->name . PHP_EOL;
   }
   return rtrim($names);
 }
