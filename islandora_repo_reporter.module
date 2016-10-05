@@ -4,3 +4,20 @@
  * @file
  * Islandora Repo Reporter module.
  */
+
+/**
+ * Implements hook_menu().
+ */
+function islandora_repo_reporter_menu() {
+  return array(
+    'admin/reports/islandora_repo_report' => array(
+    'title' => 'Islandora Repo Report',
+    'description' => 'Get a status report on your Islandora repo.',
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'islandora_repo_reporter_report',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer site configuration'),
+    'file' => 'includes/report.inc',
+    ),
+  );
+}

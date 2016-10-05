@@ -12,7 +12,9 @@ Same as any module.
 
 ## Usage
 
-Currently, this module only offers one drush command, `drush ireporepo`. Running this command will print:
+This module produces a report at `admin/reports/islandora_repo_report` similar to the standard Drupal "Status report" containing Islandora-specific information.
+
+Also, this module offers one drush command, `drush ireporepo`. Running this command will print:
 
 * the total number of objects in your repo
 * the number of collection objects
@@ -25,7 +27,6 @@ Currently, this module only offers one drush command, `drush ireporepo`. Running
 
 ## To do
 
-* Add a GUI for report
 * Add reports on:
   * Installed content models
   * XACML policies in effect
