@@ -52,6 +52,9 @@ EOQ;
 /**
  * Queries the resource index to get the most recent created on date in repo.
  *
+ * @param string $order
+ *   The order to sort in, either 'ASC' or 'DESC'.
+ *
  * @return int
  *   The date.
  */
@@ -71,4 +74,26 @@ EOQ;
 
   $result = $connection->repository->ri->sparqlQuery($ri_query, 1);
   return $result[0]['created']['value'];
+}
+
+/**
+ * Queries the Drupal {system} table to get a list of enabled Islandora modules.
+ *
+ * @return int
+ *   The date.
+ */
+function islandora_repo_reporter_get_islandora_modules() {
+  // select name from system where name like "islandora%" and status = 1 order by name
+  $result = db_select('system')
+   ->fields('system', array('name'))
+   ->condition('status', 1)
+   ->condition('name', db_like('islandora') . '%', 'LIKE')
+   ->orderBy('name', 'ASC')
+   ->execute()->fetchAll();
+
+  $names = PHP_EOL;
+  foreach ($result as $row) {
+    $names .= $row->name . PHP_EOL;
+  }
+  return rtrim($names);
 }

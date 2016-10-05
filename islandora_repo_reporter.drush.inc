@@ -49,4 +49,7 @@ function drush_islandora_repo_reporter() {
 
   $newest = islandora_repo_reporter_get_object_created_on('DESC');
   drush_print(t("Newest object created on !newest", array('!newest' => $newest)));
+
+  $module_names = islandora_repo_reporter_get_islandora_modules();
+  drush_print(t("Islandora modules enabled !modules", array('!modules' => $module_names)));
 }
