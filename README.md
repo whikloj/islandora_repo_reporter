@@ -33,7 +33,12 @@ Also, this module offers one drush command, `drush ireporepo`. Running this comm
 
 ## To do
 
-* Add additional reports (use cases welcome)
+* Add additional reports
+  * Number of objects by content model
+  * Number of objects by collection
+  * Number of objects by namespace
+  * Additional suggestions welcome
+* Move some reports to "subreports" in separate tabs, or links to other pages
 * Add error trapping so we can report Solr or Resource Index query time outs or errors
 * Add ability to pregenerate status data using Drush and cache it for use in the GUI report page
 * Add ability to write Drush command to output to a file
