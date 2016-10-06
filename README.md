@@ -21,6 +21,7 @@ Also, this module offers one drush command, `drush ireporepo`. Running this comm
 * the number of collection objects
 * the created dates of the oldest and most recent objects in the repo
 * the number of objects indexed in Solr
+* the number of objects that have XACML POLICY datastreams
 * a list of "Islandora" modules that are enabled
 
 ## Maintainer
@@ -29,10 +30,10 @@ Also, this module offers one drush command, `drush ireporepo`. Running this comm
 
 ## To do
 
-* Add ability to pregenerate status data using Druah and cache it for use in the GUI report page
-* Add reports on:
-  * Installed content models
-  * XACML policies in effect
+* Add additional reports (use cases welcome)
+* Add ability to write Drush command to output to a file
+* Add error trapping so we can report Solr or Resource Index query time outs or errors
+* Add ability to pregenerate status data using Drush and cache it for use in the GUI report page
 
 ## License and Terms of use
 

@@ -6,15 +6,14 @@
  */
 
 /**
- * Queries the resource index to get number of objects in repo.
+ * Queries the RI to get number of objects in the repo.
  *
  * @return int
  *   Number of objects returned by the query.
  */
 function islandora_repo_reporter_get_repo_object_count() {
-  $user = user_load(1);
   drupal_static_reset('islandora_get_tuque_connection');
-  $connection= islandora_get_tuque_connection($user);
+  $connection= islandora_get_tuque_connection();
 
   $ri_query = <<<EOQ
   SELECT ?object
@@ -28,15 +27,14 @@ EOQ;
 }
 
 /**
- * Queries the resource index to get number of collection objects in repo.
+ * Queries the RI to get number of collection objects in the repo.
  *
  * @return int
  *   Number of objects returned by the query.
  */
 function islandora_repo_reporter_get_collection_object_count() {
-  $user = user_load(1);
   drupal_static_reset('islandora_get_tuque_connection');
-  $connection= islandora_get_tuque_connection($user);
+  $connection= islandora_get_tuque_connection();
 
   $ri_query = <<<EOQ
   SELECT ?object
@@ -50,7 +48,7 @@ EOQ;
 }
 
 /**
- * Queries the resource index to get the most recent or earlies object in repo.
+ * Queries the RI to get the most recent or earlies object in repo.
  *
  * @param string $order
  *   The order to sort in, either 'ASC' or 'DESC'.
@@ -59,9 +57,8 @@ EOQ;
  *   An array containing the PID of the objec and the date.
  */
 function islandora_repo_reporter_get_object_created_on($order) {
-  $user = user_load(1);
   drupal_static_reset('islandora_get_tuque_connection');
-  $connection= islandora_get_tuque_connection($user);
+  $connection= islandora_get_tuque_connection();
 
   $ri_query = <<<EOQ
   SELECT ?object ?created
@@ -73,8 +70,57 @@ function islandora_repo_reporter_get_object_created_on($order) {
 EOQ;
 
   $result = $connection->repository->ri->sparqlQuery($ri_query, 1);
-  // var_dump($result);
   return array($result[0]['object']['value'], $result[0]['created']['value']);
+}
+
+/**
+ * Queries the RI to get the number of objects that have a POLICY datastream.
+ *
+ * @return int
+ *   Number of objects returned by the query.
+ */
+function islandora_repo_reporter_count_policy_datastreams() {
+  drupal_static_reset('islandora_get_tuque_connection');
+  $connection= islandora_get_tuque_connection();
+
+  $ri_query = <<<EOQ
+  SELECT ?pid
+  FROM <#ri>
+  WHERE {
+    ?dss <fedora-view:disseminationType> <info:fedora/*/POLICY> .
+    ?pid <info:fedora/fedora-system:def/view#disseminates> 
+  ?dss
+  }
+EOQ;
+
+  $ri = $connection->repository->ri;
+  return $ri->countQuery($ri_query, 'sparql');
+}
+
+/**
+ * Queries the RI to get the content models that are installed in the repo.
+ *
+ * @return array
+ *   An array containing the PIDs of installed content models.
+ */
+function islandora_repo_reporter_get_content_models() {
+  drupal_static_reset('islandora_get_tuque_connection');
+  $connection= islandora_get_tuque_connection();
+
+  $cmodels = array();
+  $ri_query = <<<EOQ
+  SELECT ?object
+  WHERE {
+    ?object <fedora-model:hasModel> <info:fedora/fedora-system:ContentModel-3.0> .
+  }
+EOQ;
+
+  $result = $connection->repository->ri->sparqlQuery($ri_query, 'unlimited');
+  foreach ($result as $cmodel) {
+    $cmodels[] = $cmodel['object']['value'];
+  }
+
+  return $cmodels;
 }
 
 /**
@@ -107,8 +153,6 @@ function islandora_repo_reporter_get_islandora_modules() {
 function islandora_repo_reporter_query_solr() {
   $query_processor = new IslandoraSolrQueryProcessor();
   $query_processor->solrQuery = "PID:*";
-  // Some very high number.
-  $query_processor->solrLimit = '5000000';
   $query_processor->executeQuery(FALSE);
   $num_pids = $query_processor->islandoraSolrResult['response']['numFound'];
   return $num_pids;
