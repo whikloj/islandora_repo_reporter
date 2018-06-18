@@ -37,6 +37,7 @@ Also, this module offers one drush command, `drush ireporepo`. Running this comm
   * Number of objects by content model
   * Number of objects by collection
   * Number of objects by namespace
+  * Number of objects by MIME type
   * Additional suggestions welcome
 * Move some reports to "subreports" in separate tabs, or links to other pages
 * Add error trapping so we can report Solr or Resource Index query time outs or errors

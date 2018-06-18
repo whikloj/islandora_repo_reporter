@@ -14,7 +14,7 @@ function islandora_repo_reporter_drush_command() {
     'aliases' => array('ireporepo'),
     'description' => 'Runs the Islandora Repo Reporter reports.',
     'examples' => array(
-      'drush ireporepo --user=admin --output_file=/tmp/output.txt',
+      'drush ireporepo --user=admin',
     ),
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_LOGIN,
   );
