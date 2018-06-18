@@ -15,7 +15,7 @@ Same as any module.
 
 This module produces a report at `admin/reports/islandora_repo_report` similar to the standard Drupal "Status report" containing Islandora-specific information:
 
-![Islandora Repo Reporter screenshot](https://dl.dropboxusercontent.com/u/1015702/linked_to/islandora_repo_reporter.png)
+![Islandora Repo Reporter screenshot](images/reporter_screencap.png)
 
 Also, this module offers one drush command, `drush ireporepo`. Running this command will print:
 
