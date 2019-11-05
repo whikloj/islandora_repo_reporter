@@ -42,7 +42,7 @@ function drush_islandora_repo_reporter() {
   $policy_count = islandora_repo_reporter_count_policy_datastreams();
   drush_print(t("Number of objects that have POLICY datastreams: !count", array('!count' => $policy_count)));
 
-  $num_pids_in_solr = islandora_repo_reporter_query_solr();
+  $num_pids_in_solr = islandora_repo_reporter_total_solr_records();
   drush_print(t("Number of objects indexed in Solr: !num_objects_in_solr", array('!num_objects_in_solr' => $num_pids_in_solr)));
 
   $cmodel_pids = islandora_repo_reporter_get_content_models();

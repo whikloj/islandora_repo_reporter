@@ -150,7 +150,7 @@ function islandora_repo_reporter_get_islandora_modules() {
  * @return int
  *   The number of PIDs Solr knows about.
  */
-function islandora_repo_reporter_query_solr() {
+function islandora_repo_reporter_total_solr_records() {
   $query_processor = new IslandoraSolrQueryProcessor();
   $query_processor->solrQuery = "PID:*";
   $query_processor->executeQuery(FALSE);
@@ -161,8 +161,13 @@ function islandora_repo_reporter_query_solr() {
 /**
  * Recursive function to walk an XML document leafs accumulating XPaths.
  *
- * @param \DOMNode $element The current element.
- * @param array $parents The parents array.
+ * @param \DOMNode $element
+ *   The current element.
+ * @param array $parents
+ *   The parents array.
+ *
+ * @throws \Exception
+ *   In case of SQL error.
  */
 function _islandora_repo_reporter_traverse(DOMNode $element, array $parents = array()) {
   $parents[] = $element->tagName;
@@ -261,10 +266,34 @@ function islandora_repo_reporter_get_elements() {
 
 /**
  * Start the MODS investigation.
+ *
+ * @param array $form
+ *   The Drupal form.
+ * @param array $form_state
+ *   The Drupal form state.
+ *
+ * @return array
+ *   The updated Drupal form.
  */
-function islandora_repo_reporter_run_mods_check($form, $form_state) {
+function islandora_repo_reporter_run_mods_check($form, &$form_state) {
+  return confirm_form(
+    $form,
+    t("Do you really want to start the MODS element check?"),
+    'admin/reports/islandora_repo_report',
+    t("This will slowly (via CRON) parse all the MODS records in your" .
+      " repository and generate a list of distinct XPaths. No attributes nor" .
+      " text content is stored. You can see the elements on the Repo Reporter" .
+      " page once it is complete."),
+    t("Start")
+  );
+}
+
+/**
+ * Implements hook_FORMID_submit().
+ */
+function islandora_repo_reporter_run_mods_check_submit($form, &$form_state) {
   if (!variable_get('islandora_repo_reporter_is_running', FALSE)) {
     variable_set('islandora_repo_reporter_is_running', TRUE);
   }
-  drupal_goto('admin/reports/islandora_repo_report');
+  $form_state['redirect'] = 'admin/reports/islandora_repo_report';
 }

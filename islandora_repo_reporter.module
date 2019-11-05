@@ -21,7 +21,7 @@ function islandora_repo_reporter_menu() {
     'access arguments' => array('administer site configuration'),
     'file' => 'includes/report.inc',
     ),
-    'admin/reports/islandora_repo_report/run' => array(
+    'admin/reports/islandora_repo_report/run_mods' => array(
       'description' => 'Start running the MODS investigation jobs',
       'type' => MENU_CALLBACK,
       'page callback' => 'drupal_get_form',

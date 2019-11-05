@@ -24,7 +24,7 @@ function islandora_repo_reporter_report() {
   $policy_count = islandora_repo_reporter_count_policy_datastreams();
   $items['islandora_repo_reporter_policy_count'] = array('title' => t('Number of objects with POLICY datastreams'), 'value' => $policy_count);
 
-  $num_pids_in_solr = islandora_repo_reporter_query_solr();
+  $num_pids_in_solr = islandora_repo_reporter_total_solr_records();
   $items['islandora_repo_reporter_pids_in_solr'] = array('title' => t('Number of objects indexed in Solr'), 'value' => $num_pids_in_solr);
 
   $cmodel_pids = islandora_repo_reporter_get_content_models();
@@ -50,7 +50,8 @@ function islandora_repo_reporter_report() {
   $element_list = array();
   if (variable_get('islandora_repo_reporter_is_running', FALSE)) {
     // We are running so we can't report.
-    $element_list_output = t('The MODS investigation is still in process, check back later');
+    $current = variable_get('islandora_repo_reporter_mods_check_offset', 0);
+    $element_list_output = t("The MODS investigation is still in process, completed {$current} of {$num_pids_in_solr} records. Check back later.");
   }
   else {
     // We aren't running, do we have elements?
@@ -62,7 +63,7 @@ function islandora_repo_reporter_report() {
       $element_list_output = theme('item_list', $element_list);
     }
     else {
-      $element_list_output = l('No data, please run the cron job by clicking this link', 'admin/reports/islandora_repo_report/run');
+      $element_list_output = l('No data, please run the cron job by clicking this link', 'admin/reports/islandora_repo_report/run_mods');
     }
   }
   $items['islandora_repo_reporter_mods_elements'] = array('title' => t('MODS elements used'), 'value' => $element_list_output);

@@ -33,6 +33,7 @@ function islandora_repo_reporter_schema() {
 function islandora_repo_reporter_uninstall() {
   $variables = array(
     'islandora_repo_reporter_is_running',
+    'islandora_repo_reporter_mods_check_offset',
   );
   array_walk($variables, 'variable_del');
 }
