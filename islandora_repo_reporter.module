@@ -37,7 +37,6 @@ function islandora_repo_reporter_menu() {
  * Implements hook_cron_queue_info().
  */
 function islandora_repo_reporter_cron_queue_info() {
-  error_log("In the cron info\n", 3, '/tmp/cron.log');
   $queue = DrupalQueue::get('islandora_repo_reporter_objects', TRUE);
   $queues = array();
   $queues['islandora_repo_reporter_objects'] = array(
@@ -74,7 +73,6 @@ function islandora_repo_reporter_cron() {
  * Cron worker function that does the processing of the objects in the queue.
  */
 function islandora_repo_reporter_batch_check_objects() {
-  error_log("In the check objects\n", 3, '/tmp/cron.log');
   module_load_include('inc', 'islandora_repo_reporter', 'includes/utilities');
   $queue = DrupalQueue::get('islandora_repo_reporter_objects', TRUE);
 
