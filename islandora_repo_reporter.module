@@ -5,6 +5,8 @@
  * Islandora Repo Reporter module.
  */
 
+define('ISLANDORA_REPO_REPORTER_CRON_RUN_SIZE', 50);
+
 /**
  * Implements hook_menu().
  */
@@ -19,5 +21,73 @@ function islandora_repo_reporter_menu() {
     'access arguments' => array('administer site configuration'),
     'file' => 'includes/report.inc',
     ),
+    'admin/reports/islandora_repo_report/run' => array(
+      'description' => 'Start running the MODS investigation jobs',
+      'type' => MENU_CALLBACK,
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('islandora_repo_reporter_run_mods_check'),
+      'access callback' => 'user_access',
+      'access arguments' => array('administer site configuration'),
+      'file' => 'includes/utilities.inc',
+    ),
   );
+}
+
+/**
+ * Implements hook_cron_queue_info().
+ */
+function islandora_repo_reporter_cron_queue_info() {
+  error_log("In the cron info\n", 3, '/tmp/cron.log');
+  $queue = DrupalQueue::get('islandora_repo_reporter_objects', TRUE);
+  $queues = array();
+  $queues['islandora_repo_reporter_objects'] = array(
+    'worker callback' => 'islandora_repo_reporter_batch_check_objects',
+    'time' => 60,
+  );
+  return $queues;
+}
+
+/**
+ * Implements hook_cron().
+ */
+function islandora_repo_reporter_cron() {
+  if (variable_get('islandora_repo_reporter_is_running', FALSE)) {
+    module_load_include('inc', 'islandora_repo_reporter', 'includes/utilities');
+    $queue = DrupalQueue::get('islandora_repo_reporter_objects', TRUE);
+    $numItems = $queue->numberOfItems();
+
+    $limit = ISLANDORA_REPO_REPORTER_CRON_RUN_SIZE;
+
+    if ($numItems < $limit) {
+      $limit = (int)$limit - (int) $numItems;
+    }
+    $objects_to_process = islandora_repo_reporter_populate_object_queue($limit);
+
+    $queue = DrupalQueue::get('islandora_repo_reporter_objects');
+    foreach ($objects_to_process as $object) {
+      $queue->createItem($object);
+    }
+  }
+}
+
+/**
+ * Cron worker function that does the processing of the objects in the queue.
+ */
+function islandora_repo_reporter_batch_check_objects() {
+  error_log("In the check objects\n", 3, '/tmp/cron.log');
+  module_load_include('inc', 'islandora_repo_reporter', 'includes/utilities');
+  $queue = DrupalQueue::get('islandora_repo_reporter_objects', TRUE);
+
+  while ($data = $queue->claimItem()) {
+    $object = islandora_object_load($data->data);
+    if ($object !== FALSE && isset($object['MODS'])) {
+        $xml = $object['MODS']->content;
+        $dom = new DOMDocument();
+        $dom->loadXML($xml);
+        $top_element = $dom->documentElement;
+        _islandora_repo_reporter_traverse($top_element);
+    }
+    $queue->deleteItem($data);
+  }
+
 }

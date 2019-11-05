@@ -47,5 +47,25 @@ function islandora_repo_reporter_report() {
   $module_list_output = theme('item_list', $module_list);
   $items['islandora_repo_reporter_islandora_modules'] = array('title' => t('Islandora modules enabled'), 'value' => $module_list_output);
 
+  $element_list = array();
+  if (variable_get('islandora_repo_reporter_is_running', FALSE)) {
+    // We are running so we can't report.
+    $element_list_output = t('The MODS investigation is still in process, check back later');
+  }
+  else {
+    // We aren't running, do we have elements?
+    $elements = islandora_repo_reporter_get_elements();
+    // Do we have any data?
+    if (count($elements) > 0) {
+      $element_list['type'] = 'ul';
+      $element_list['items'] = array_keys($elements);
+      $element_list_output = theme('item_list', $element_list);
+    }
+    else {
+      $element_list_output = l('No data, please run the cron job by clicking this link', 'admin/reports/islandora_repo_report/run');
+    }
+  }
+  $items['islandora_repo_reporter_mods_elements'] = array('title' => t('MODS elements used'), 'value' => $element_list_output);
+
   return theme('status_report', array('requirements' => $items));
 }

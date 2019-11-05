@@ -126,8 +126,8 @@ EOQ;
 /**
  * Queries the Drupal {system} table to get a list of enabled Islandora modules.
  *
- * @return int
- *   The date.
+ * @return array
+ *   The modules.
  */
 function islandora_repo_reporter_get_islandora_modules() {
   $result = db_select('system')
@@ -156,4 +156,115 @@ function islandora_repo_reporter_query_solr() {
   $query_processor->executeQuery(FALSE);
   $num_pids = $query_processor->islandoraSolrResult['response']['numFound'];
   return $num_pids;
+}
+
+/**
+ * Recursive function to walk an XML document leafs accumulating XPaths.
+ *
+ * @param \DOMNode $element The current element.
+ * @param array $parents The parents array.
+ */
+function _islandora_repo_reporter_traverse(DOMNode $element, array $parents = array()) {
+  $parents[] = $element->tagName;
+  $numchildren = $element->childNodes->length;
+  $element_kids = FALSE;
+  if ($numchildren > 0) {
+    for ($foo = 0; $foo < $numchildren; $foo += 1) {
+      $child = $element->childNodes->item($foo);
+      if ($child instanceof DOMElement) {
+        $element_kids = TRUE;
+        _islandora_repo_reporter_traverse($child, $parents);
+      }
+    }
+  }
+  if (!$element_kids) {
+    _islandora_repo_reporter_report_mods_path($parents);
+  }
+}
+
+/**
+ * Utility to populate the reporter table with the mods xpaths.
+ *
+ * @param array $parents array of parents elements.
+ * @throws \Exception On sql error.
+ */
+function _islandora_repo_reporter_report_mods_path(array $parents) {
+  try {
+    db_insert('islandora_repo_reporter_mods_elements')
+      ->fields(array(
+        'elements' => '/' . implode('/', $parents),
+      ))->execute();
+  } catch (PDOException $e) {
+    // Unique key exception so we can swallow it.
+  }
+}
+
+/**
+ * Populate the check objects queue.
+ *
+ * @param int $limit Number of items to return this time.
+ *
+ * @return array Array of pids to check.
+ */
+function islandora_repo_reporter_populate_object_queue($limit) {
+  global $user;
+  // Need to switch to admin to get all objects.
+  $original_user = $user;
+  $old_state = drupal_save_session();
+  drupal_save_session(FALSE);
+  $user = user_load(1);
+
+  $offset = (int) variable_get('islandora_repo_reporter_mods_check_offset', 0);
+
+  $query_processor = new IslandoraSolrQueryProcessor();
+  $query_processor->solrQuery = "PID:*";
+  $query_processor->solrParams['sort'] = 'PID asc';
+  $query_processor->solrParams['fl'] = array('PID');
+  $query_processor->solrParams['rows'] = $limit;
+  $query_processor->solrLimit = $limit;
+  $query_processor->solrStart = $offset;
+
+  $query_processor->executeQuery(FALSE);
+  $pids = $query_processor->islandoraSolrResult['response']['objects'];
+
+  array_walk($pids, function(&$item) {
+    $item = $item['PID'];
+  });
+
+  if (count($pids) < $limit) {
+    $offset = 0;
+    variable_set('islandora_repo_reporter_is_running', FALSE);
+  }
+  else {
+    $offset = (int) $offset + (int) $limit;
+  }
+
+  variable_set('islandora_repo_reporter_mods_check_offset', $offset);
+
+  // Switch back to user
+  $user = $original_user;
+  drupal_save_session($old_state);
+
+  return $pids;
+}
+
+/**
+ * Get the MODS elements from the database, if any.
+ *
+ * @return array
+ *   Of MODS element names.
+ */
+function islandora_repo_reporter_get_elements() {
+  $result = db_query('SELECT elements FROM {islandora_repo_reporter_mods_elements}');
+  return $result->fetchAllAssoc('elements');
+}
+
+/**
+ * Start the MODS investigation.
+ */
+function islandora_repo_reporter_run_mods_check($form, $form_state) {
+  if (!variable_get('islandora_repo_reporter_is_running', FALSE)) {
+    variable_set('islandora_repo_reporter_is_running', TRUE);
+  }
+  drupal_goto('admin/reports/islandora_repo_report');
 }
